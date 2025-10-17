@@ -35,9 +35,9 @@ int Generazione::Multiplicity(bool distr, int nScelto){
 
     if (distr == true) {
         if (nScelto == 0)
-            Multi = gRandom->Uniform(2, 55);
+            Multi = round(gRandom->Uniform(3, 55));
         else
-            Multi = fHm->GetRandom();       
+            Multi = round(fHm->GetRandom());       
     }
     else {
         Multi = nScelto;

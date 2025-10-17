@@ -1,7 +1,10 @@
 #ifndef TRASPORTO_H
 #define TRASPORTO_H
 
+#include "Defstruct.h"  
 #include "TObject.h"
+#include "TTree.h"
+#include "TBranch.h"
 
 class Trasporto : public TObject{
 
@@ -11,12 +14,17 @@ public:
     virtual ~Trasporto();
 
     void Condizione(double x, double y, double z, int strato, int evento);
-    void EquazioneRetta1(double punto[3], double azimut, double tetha);
-    void EquazioneRetta2(double punto[3], double versori[3], int strato);
-    void Scattering1(double versori[3], double tetha, double azimut, bool on);
-    void Scattering2(double versori[3], bool on);
-    double Phi(double x, double y);
+    void EquazioneRetta(double punto[3], double versori[3], double R);
+    void Scattering(double versori[3], bool on);
     double GetHRiv() const { return fHRiv; }
+    double GetRPipe() const { return fRPipe; }
+    double GetRLayer1() const { return fRLayer1; }
+    double GetRLayer2() const { return fRLayer2; }
+    double SmearingPhi(double x, double y, double R);
+    double SmearingZ(double z);
+    void Rumore(Hit* xhit2, Hit* xhit3, TTree* hit2, TTree* hit3, int et, bool on);
+    double GenRandom();
+
 
 private:
     Trasporto(const Trasporto& source);
@@ -25,8 +33,10 @@ private:
     double fRPipe;           // raggio Beam Pipe
     double fRLayer1;         // raggio primo Layer
     double fRLayer2;         // raggio secondo Layer
-    double fHRiv;
-    double fRMSspace;
+    double fHRiv;            //lunghezza del rivelatore
+    double fRMSspace;        //RMS spaziale del multiple scattering
+    double fRMSz;            //RMS dello smearing di z
+    double fRMSphi;          //RMS dello smearing di phi
 
     ClassDef(Trasporto,1);
 };
