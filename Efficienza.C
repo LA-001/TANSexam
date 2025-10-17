@@ -1,105 +1,93 @@
 #include <Riostream.h>
-#include <TFile.h>
-#include <TMath.h>
-#include <TNtupleD.h>
-#include <TCanvas.h>
-#include <TLegend.h>
-#include <TGraphAsymmErrors.h>
-#include <TH1F.h>
-#include <TStopwatch.h>
-#include <TEfficiency.h>
+#include "TFile.h"
+#include "TMath.h"
+#include "TNtupleD.h"
+#include "TCanvas.h"
+#include "TGraphAsymmErrors.h"
+#include "TH1F.h"
+#include "TStopwatch.h"
+#include "TEfficiency.h"
 
-void Efficienza(){
+#include "Defstruct.h"
 
-	TFile *fin1 = TFile::Open("fileRoot/output.root");
+void Efficienza() {
+
+	TFile *fin1 = TFile::Open("fileRoot/residui.root");
     TFile *fin2 = TFile::Open("fileRoot/simulazione.root");
-	TNtupleD *vtx = (TNtupleD*)fin1->Get("vtx");
-    TNtupleD *vrt = (TNtupleD*)fin2->Get("vrt");
+    if (!fin1 || !fin2) {
+        std::cerr << "Errore: file non trovati.\n";
+        return;
+    }
 
-	//TFile fout("fileRoot/efficienza.root","RECREATE");
+    TTree *T_vtx = (TTree*)fin1->Get("T_vtx");
+    TTree *T_vrt = (TTree*)fin2->Get("T_vrt");
+    if (!T_vtx || !T_vrt) {
+        std::cerr << "Errore: TTree non trovati.\n";
+        return;
+    }
 
-	double molti, moltiRic, z0, Zric;
+    Ric vertex;
+    Vrt MC;
+    T_vtx->SetBranchAddress("vtx", &vertex);
+    T_vrt->SetBranchAddress("vrt", &MC);
 
-    vrt->SetBranchAddress("moltiplicita", &molti);
-    vrt->SetBranchAddress("z0", &z0);
-    vtx->SetBranchAddress("molti", &moltiRic);
-    vtx->SetBranchAddress("z0", &Zric);
+	double edgesMolti[] = {2, 4, 6, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55};
+	int nBinsMolti = sizeof(edgesMolti)/sizeof(edgesMolti[0]) - 1;
 
-	TEfficiency* eff = new TEfficiency("eff", "Efficienza vs molteplicita'; molteplicita' ; #epsilon", 11, 0, 55);
-	TEfficiency* eff_v = new TEfficiency("eff_v", "Efficienza vs Z_{true}; Z_{true} [mm] ; #epsilon", 16, -160, 160);
+    const int nBinZ = 16;
+    const double minZ = -160;
+    const double maxZ = 160;
+    int bin_M, bin_V;
 
-    double conta = 0, contaRic = 0;
+    TH1F h_tot_M("h_tot_M","Totale;Molteplicità;Events", nBinsMolti, edgesMolti);
+    TH1F h_pass_M("h_pass_M","Passati;Molteplicità;Events", nBinsMolti, edgesMolti);
+    TH1F h_tot_V("h_tot_V","Totale;Molteplicità;Events", nBinZ, minZ, maxZ);
+    TH1F h_pass_V("h_pass_V","Passati;Molteplicità;Events", nBinZ, minZ, maxZ);
+ 
+    for (long ev = 0; ev < T_vrt->GetEntries(); ++ev) {
+        T_vrt->GetEntry(ev);
+        h_tot_M.Fill(MC.moltiplicita);
+        h_tot_V.Fill(MC.z0);
+    }
 
-//***********************************************************************************************************************
+    for (long ev = 0; ev < T_vtx->GetEntries(); ++ev) {
+        T_vtx->GetEntry(ev);
+        h_pass_M.Fill(vertex.molti);
+        h_pass_V.Fill(vertex.z0);
+    }
 
-    for(int i = 1; i <= 11; i++){
-		for(int ev = 0; ev < vtx->GetEntries(); ev++){
-			vtx->GetEntry(ev);
-			if((i*5 - 2.5) <= moltiRic && moltiRic <= (i*5 + 2.5)){
-				contaRic++;	  
-            }                        
-        }
-        for(int ev = 0; ev < vrt->GetEntries(); ev++){
-			vrt->GetEntry(ev);
-			if((i*5 - 2.5) <= molti && molti <= (i*5 + 2.5)){
-				conta++;	  
-            }                       
-        }
+    TEfficiency* eff = new TEfficiency(h_pass_M, h_tot_M);
+    eff->SetName("eff");
+    eff->SetTitle("Efficienza vs molteplicita'; Molteplicità; #epsilon");
+    TEfficiency* eff_v = new TEfficiency(h_pass_V, h_tot_V);
+    eff_v->SetName("eff_v");
+    eff_v->SetTitle("Efficienza vs Z_{true}; Z_{true} [mm]; #epsilon");
 
-		eff->SetTotalEvents(i , conta); 
-        eff->SetPassedEvents(i , contaRic);
+	TCanvas *c6 = new TCanvas("c6", "Efficienza vs molteplicita'", 1000, 700);
+    c6->SetLeftMargin(0.1);
+    eff->SetMarkerStyle(20);
+    eff->SetMarkerSize(1);
+    TEfficiency *eff_clone = (TEfficiency*)eff->Clone("eff_clone");
+    eff_clone->SetDirectory(0);
+    eff_clone->Draw("APL");
+    c6->SetGrid();
+    c6->SaveAs("Plot/c6.png");
 
-		contaRic = 0;
-        conta = 0;	
-	}
-
-//***********************************************************************************************************************
-
-	for(int i = 1; i <= 16; i++){
-		for(int ev = 0; ev < vtx->GetEntries(); ev++){
-			vtx->GetEntry(ev);
-			if((-160 + (i - 1)*20) <= Zric && Zric <= (-160 + i*20)){
-				contaRic++;	  
-            }                        
-        }
-        for(int ev = 0; ev < vrt->GetEntries(); ev++){
-			vrt->GetEntry(ev);
-			if((-160 + (i - 1)*20) <= z0 && z0 <= (-160 + i*20)){
-				conta++;	  
-            }                       
-        }
-
-		eff_v->SetTotalEvents(i , conta); 
-        eff_v->SetPassedEvents(i, contaRic);
-
-		contaRic = 0;
-        conta = 0;
-	}
-
-//***********************************************************************************************************************
-
-    TCanvas *c6 = new TCanvas("c6", "c6", 1000, 700);
-	c6->SetLeftMargin(0.1);
-	eff->SetMarkerStyle(20);
-	eff->SetMarkerSize(1);
-	eff->Draw("AP");
-	c6->SetGrid();
-	c6->SaveAs("Plot/c6.png");
-
-	TCanvas *c7 = new TCanvas("c7", "c7", 1000, 700);
-	c7->SetLeftMargin(0.1);	
-	eff_v->SetMarkerStyle(20);
-	eff_v->SetMarkerSize(1);
-	eff_v->Draw("AP");
+    TCanvas *c7 = new TCanvas("c7", "Efficienza vs Z_{true}", 1000, 700);
+    c7->SetLeftMargin(0.1);
+    eff_v->SetMarkerStyle(20);
+    eff_v->SetMarkerSize(1);
+    TEfficiency *eff_v_clone = (TEfficiency*)eff_v->Clone("eff_v_clone");
+    eff_v_clone->SetDirectory(0);
+    eff_v_clone->Draw("AP");
     c7->SetGrid();
     c7->SaveAs("Plot/c7.png");
 
-	// eff->Write();
-	// eff_v->Write();
-	// fout.Close();
+    TFile fout("fileRoot/efficienza.root","RECREATE");
+    eff->Write();
+    eff_v->Write();
+    fout.Close();
 
-	// fin1->Close();
-	// fin2->Close();
-	// delete fin1;
-	// delete fin2;
+    fin1->Close();
+    fin2->Close();
 }

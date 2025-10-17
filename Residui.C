@@ -1,69 +1,71 @@
-#include <Riostream.h>
-#include <TFile.h>
-#include <TMath.h>
-#include <TNtupleD.h>
+#include "Riostream.h"
+#include "TFile.h"
+#include "TMath.h"
+#include "TTree.h"
+#include "TCanvas.h"
+#include "TH1D.h"
+#include "TStopwatch.h"
+#include "TStyle.h"
+
 #include <vector>
-#include <algorithm>
-#include <TCanvas.h>
-#include <TH1F.h>
-#include <TStopwatch.h>
-#include <TStyle.h>
+#include <map>
 
 #include "MyEs.h"
+#include "Defstruct.h"
 
 using namespace std;
 
-void Residui(){
-	
-	TStopwatch timer;
+void Residui() {
+
+    TStopwatch timer;
+    timer.Start();
 
     MyEs *ptr = new MyEs();
 
-	TFile *fin = TFile::Open("fileRoot/simulazione.root");
+    TFile *fin = TFile::Open("fileRoot/simulazione.root");
     if (!fin || fin->IsZombie()) {
-        cout<<"Errore: impossibile aprire il file ROOT."<<endl;
+        cout << "Errore: impossibile aprire il file ROOT." << endl;
         fin->Close();
         delete fin;
         return;
     }
 
-	TFile fout("fileRoot/output.root", "RECREATE");
+    TFile fout("fileRoot/residui.root", "RECREATE");
 
-    double z0, molti, labelMC;
-	int et = 1;
-	double r2, phi2, z2, r3, phi3, z3, label1, label2;
+    Vrt mc;
+    Hit hitL1, hitL2;
+    Ric xvtx;
+
+    TTree *T_vtx = new TTree("T_vtx","TTree vertici ricostruiti e veri");
+    T_vtx->Branch("vtx", &xvtx, "z0/D:zRic/D:molti/I");
+
+    TTree *T_MC = (TTree*)fin->Get("T_vrt");
+    TTree *T_rec1 = (TTree*)fin->Get("T_hitL1");
+    TTree *T_rec2 = (TTree*)fin->Get("T_hitL2");
+    T_MC->SetBranchAddress("vrt", &mc);
+    T_rec1->SetBranchAddress("hitL1", &hitL1);
+    T_rec2->SetBranchAddress("hitL2", &hitL2);
+
     double inter, deltaPhi = 0, A, B, C, D;
-    int k = 1;
-    int lablab = 1;
-    double media; 
-    int inizio = 0;
+    int lablab = -1;
+    double media, Phi_VM = 0.004, z_max = 170., z_min = -170.;
+
     vector<double> vertice;
     vector<double> intervalloVer;
+    map<int, vector<Hit>> hitsByLabel;      //map<chiave,valore> nomeMappa, uso come chiave l'etichetta int e gli aggiungo il vettore associato
 
-    TNtupleD *MC = (TNtupleD*)fin->Get("vrt");
-	TNtupleD *rec1 = (TNtupleD*)fin->Get("hit2");
-    TNtupleD *rec2 = (TNtupleD*)fin->Get("hit3");
-	
-    MC->SetBranchAddress("z0", &z0);
-    MC->SetBranchAddress("moltiplicita", &molti);
-    
-	rec1->SetBranchAddress("r2", &r2);
-	rec1->SetBranchAddress("phi2", &phi2);
-	rec1->SetBranchAddress("z2", &z2);
-    rec1->SetBranchAddress("etichetta", &label1);
-
-	rec2->SetBranchAddress("r3", &r3);
-	rec2->SetBranchAddress("phi3", &phi3);
-	rec2->SetBranchAddress("z3", &z3);
-	rec2->SetBranchAddress("etichetta", &label2);
+    for (long i = 0; i < T_rec2->GetEntries(); ++i) {
+        T_rec2->GetEntry(i);
+        hitsByLabel[hitL2.etichetta].push_back(hitL2);        //nomeMappa[chiave].push_back(vettore), è come se mi creasse una tabella con una colonna le chiavi e un'altra i vettori
+    }
 
     TCanvas *cv[3];
-    TH1F *hist[3];
-    char nome[5];
+    TH1D *hist[3];
+    char nome[10];
 
-    hist[0] = new TH1F("hist0", "Residui",  300, -600, 600);
-    hist[1] = new TH1F("hist1", "Residui con molteplicita' 6", 100, -600, 600);
-    hist[2] = new TH1F("hist2", "Residui con molteplicita' compresa tra [45,55]", 100, -500, 500);
+    hist[0] = new TH1D("hist0", "Residui",  300, -600, 600);
+    hist[1] = new TH1D("hist1", "Residui con molteplicita' 6", 101, -600, 600);
+    hist[2] = new TH1D("hist2", "Residui con molteplicita' compresa tra [45,55]", 101, -500, 500);
 
     for(int i = 0; i <= 2; i++){
         hist[i]->GetXaxis()->SetTitle("Residui [#mum]");
@@ -71,78 +73,57 @@ void Residui(){
         hist[i]->SetLineColor(kBlack);
     }
 
-	TNtupleD *vtx = new TNtupleD("vtx", "vertici ricostruiti e generati", "z0:molti:zRic");
-    double xvtx[3];
-    TNtupleD *ver = new TNtupleD("ver", "vertici ricostruiti da mediare", "zric:etichetta");
-    double xver[2];
+//-----------------------------------------------------------------------------------------------------------------
+for(long ev = 0; ev < T_rec1->GetEntries(); ++ev){
+    T_rec1->GetEntry(ev);
 
-	timer.Start();
+    if (lablab != hitL1.etichetta){
+        media = ptr->RunWind(vertice);
 
-    for(long ev = 0; ev < rec1->GetEntries(); ev++){
-        rec1->GetEntry(ev);
-        
-		A = r2;
-        B = phi2;            
-        C = z2;
+        if (z_min <= media && media <= z_max) {
+            T_MC->GetEntry(hitL1.etichetta - 2);
 
-        if(label1 != lablab){
-            lablab = label1;
-            inizio = k;
+            hist[0]->Fill((media - mc.z0) * 1000);
+            if (mc.moltiplicita == 6) hist[1]->Fill((media - mc.z0) * 1000);
+            if (mc.moltiplicita > 44 && mc.moltiplicita < 56) hist[2]->Fill((media - mc.z0) * 1000);
 
-            if(vertice.size() > 2){
-                //sort(vertice.begin(), vertice.end());
-                //intervalloVer = ptr->IntervalloVtx(vertice,vertice[0],vertice[vertice.size()-1]);
-                intervalloVer = ptr->IntervalloVtx2(vertice);
-        	    media = ptr->MediaVector(intervalloVer);
-
-                if(-170. <= media && media <= 170.){
-                    MC->GetEntry(label1 - 2);
-                            
-        	        hist[0]->Fill((media - z0) * 1000);
-				    if (molti == 6) hist[1]->Fill((media - z0) * 1000);
-        		    if (molti > 44 && molti < 56) hist[2]->Fill((media - z0) * 1000);
-                    
-                    xvtx[0] = z0;
-				    xvtx[1] = molti;
-				    xvtx[2] = media;
-                            
-			        vtx->Fill(xvtx);
-                }
-                vertice.clear(); 
-            }
+            xvtx.z0 = mc.z0;
+            xvtx.molti = mc.moltiplicita;
+            xvtx.zRic = media;
+            T_vtx->Fill();
         }
 
-        for (long ev2 = inizio; ev2 < rec2->GetEntries(); ev2++) {
-            rec2->GetEntry(ev2);
+        vertice.clear();
+        lablab = hitL1.etichetta;
+    }
 
-            if(label2 != label1){
-                k = ev2;
-                break;
-            }
-                            
-            D = phi3;
+    A = hitL1.r;
+    B = hitL1.phi;
+    C = hitL1.z;
+
+    map<int, vector<Hit>>::iterator it = hitsByLabel.find(hitL1.etichetta);
+    if (it != hitsByLabel.end()) {          //se .find() non ha riscontro di etichetta rilascia un iteratore speciale .end(), se così fosse non avrei nulla da cercare e dunque salta l'if
+        for (const Hit& h : it->second) {   //Per ogni elemento (Hit) contenuto nel vettore it->second, crea un riferimento costante chiamato h e fai qualcosa con esso
+            D = h.phi;
 
             deltaPhi = TMath::Abs(B - D);
+            if (deltaPhi > TMath::Pi()) deltaPhi = 2 * TMath::Pi() - deltaPhi;
 
-            if (deltaPhi > TMath::Pi()) {
-                deltaPhi = 2 * TMath::Pi() - deltaPhi;
-            } 
-
-            if (deltaPhi <= 0.0018) {
-                inter = ptr->Intersezione(A, C, r3, z3);
-                if (inter >= -165. && inter <= 165.) {
+            if (deltaPhi <= Phi_VM) {
+                inter = ptr->Intersezione(A, C, h.r, h.z);
+                if (inter >= z_min && inter <= z_max) {
                     vertice.push_back(inter);
                 }
             }
         }
     }
-    
-    timer.Stop();
-	timer.Print();
+}
 
-	gStyle->SetOptStat(11);
-	gStyle->SetOptFit(1);
- 
+//-----------------------------------------------------------------------------------------------------------------
+
+    gStyle->SetOptStat(11);
+    gStyle->SetOptFit(1);
+
     for(int i = 0; i < 3; i++){
         snprintf(nome, 5, "c%i", i + 1);
         cv[i] = new TCanvas(nome, nome, 1200, 800);
@@ -154,12 +135,14 @@ void Residui(){
         cv[i]->SaveAs(Form("Plot/%s.png", nome));
     }
 
-    vtx->Write();
+    T_vtx->Write();
     fout.Purge();
     fout.Close();
 
     fin->Close();
     delete fin;
+    delete ptr;
 
-    delete ptr; 
+    timer.Stop();
+    timer.Print();
 }

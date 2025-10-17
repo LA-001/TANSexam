@@ -1,134 +1,127 @@
-#include <Riostream.h>
-#include <TFile.h>
-#include <TMath.h>
-#include <TNtupleD.h>
-#include <TLeaf.h>
-#include <TStopwatch.h>
-#include "TRandom.h"
+#include "Riostream.h"
+#include "TFile.h"
+#include "TMath.h"
+#include "TStopwatch.h"
+#include "TRandom3.h"
+#include "TTree.h"
 
 #include "Generazione.h"
 #include "Trasporto.h"
-#include "Ricostruzione.h"
+#include "Defstruct.h"
 
 using namespace std;
 
-void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m){
+//67599
 
+void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     TStopwatch timer;
 
     TFile *file = TFile::Open("fileRoot/kinem.root");
     if (!file || file->IsZombie()) {
-        cout<<"Errore: impossibile aprire il file ROOT."<<endl;
-        file->Close();
-        delete file;
+        cerr << "Errore: impossibile aprire il file ROOT." << endl;
         return;
     }
-
+    
     TH1F *hm = (TH1F*)file->Get("hm");
     TH1F *eta = (TH1F*)file->Get("heta2");
     if (!hm || !eta) {
-        cout<<"Errore: istogrammi 'hm' o 'heta2' non trovati."<<endl;
+        cerr << "Errore: istogrammi 'hm' o 'heta2' non trovati." << endl;
+        file->Close();
         return;
     }
 
-    TFile fout("fileRoot/simulazione.root","RECREATE");
+    TFile fout("fileRoot/simulazione.root", "RECREATE");
 
     gRandom->SetSeed(seed);
 
-    Generazione *ptr = new Generazione(eta,hm);
+    Generazione *ptr = new Generazione(eta, hm);
     Trasporto *ptr2 = new Trasporto();
-    Ricostruzione *ptr3 = new Ricostruzione();
 
-    TNtupleD *nt = new TNtupleD("nt","generazione vertice","x0:y0:z0:phi:tetha");
-    double xnt[5]; 
-    TNtupleD *hit2 = new TNtupleD("hit2","hit layer2","r2:phi2:z2:etichetta");
-    double xhit2[4];
-    TNtupleD *hit3 = new TNtupleD("hit3","hit layer3","r3:phi3:z3:etichetta");
-    double xhit3[4];
-    TNtupleD *vrt = new TNtupleD("vrt","verità montecarlo","x0:y0:z0:moltiplicita");
-    double xvrt[4]; 
+    Hit xhitL1, xhitL2;
+    Vrt xvrt;
 
-    double x0, y0, z0, molti, phi, tetha;
+    TTree *T_hitL1 = new TTree("T_hitL1","TTree hit Layer 1");
+    T_hitL1->Branch("hitL1", &xhitL1, "r/D:phi/D:z/D:etichetta/I");
+
+    TTree *T_hitL2 = new TTree("T_hitL2","TTree hit Layer 2");
+    T_hitL2->Branch("hitL2", &xhitL2, "r/D:phi/D:z/D:etichetta/I");
+
+    TTree *T_vrt = new TTree("T_vrt","TTree della VM");
+    T_vrt->Branch("vrt", &xvrt, "x0/D:y0/D:z0/D:moltiplicita/I");
+
+    T_hitL1->SetAutoFlush(500000); 
+    T_hitL2->SetAutoFlush(500000);
+    T_vrt->SetAutoFlush(500000);
+
     double punto[3], versori[3];
-    double H = ptr2->GetHRiv();
+    double H = ptr2->GetHRiv(), phi, tetha, r;
 
     timer.Start();
 
-    for(int tot = 1; tot<= numero; tot++){	  
+    for (int tot = 1; tot <= numero; ++tot) {
+        double x0 = ptr->VertexSimXY();
+        double y0 = ptr->VertexSimXY();
+        double z0 = ptr->VertexSimZ(distr_z);
+        int molti = ptr->Multiplicity(distr_m, m);
 
-        x0 = ptr->VertexSimXY();  
-        y0 = ptr->VertexSimXY();  
-        z0 = ptr->VertexSimZ(distr_z);   
-        molti = ptr->Multiplicity(distr_m, m); 
+        xvrt.x0 = x0;
+        xvrt.y0 = y0;
+        xvrt.z0 = z0;
+        xvrt.moltiplicita = molti;
+        T_vrt->Fill();
 
-        for (int i = 0; i < molti; i++) {
-            xnt[0] = x0; 
-            xnt[1] = y0; 
-            xnt[2] = z0; 
-            xnt[3] = ptr->Azimut();
-            xnt[4] = ptr->Tetha();
-            
-            nt->Fill(xnt);
-        }
+        for (int i = 0; i < molti; ++i) {
+            phi = ptr->Azimut();
+            tetha = ptr->Tetha();
 
-        xvrt[0] = x0;
-        xvrt[1] = y0; 
-        xvrt[2] = z0;
-        xvrt[3] = molti;
-        vrt->Fill(xvrt);
+            versori[0] = TMath::Sin(tetha) * TMath::Cos(phi);
+            versori[1] = TMath::Sin(tetha) * TMath::Sin(phi);
+            versori[2] = TMath::Cos(tetha);
 
-        for(int ev = 0; ev < nt->GetEntries(); ev++){
-            nt->GetEntry(ev);
+            punto[0] = x0;
+            punto[1] = y0;
+            punto[2] = z0;
 
-            punto[0] = nt->GetLeaf("x0")->GetValue();
-            punto[1] = nt->GetLeaf("y0")->GetValue();
-            punto[2] = nt->GetLeaf("z0")->GetValue();
-            phi = nt->GetLeaf("phi")->GetValue();
-            tetha = nt->GetLeaf("tetha")->GetValue();
+            ptr2->EquazioneRetta(punto, versori, ptr2->GetRPipe());
+            ptr2->Scattering(versori, true);
+            ptr2->EquazioneRetta(punto, versori, ptr2->GetRLayer1());
 
-            ptr2->EquazioneRetta1(punto, phi, tetha);
-            ptr2->Scattering1(versori, tetha, phi, false);
-            ptr2->EquazioneRetta2(punto, versori, 2);
+            if (-H/2. <= punto[2] && punto[2] <= H/2.) {
+                xhitL1.r = ptr2->GetRLayer1();
+                xhitL1.phi = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer1());
+                xhitL1.z = ptr2->SmearingZ(punto[2]);
+                xhitL1.etichetta = tot;
 
-            if(-H/2. <= punto[2] && punto[2] <= H/2.){
-                xhit2[0] = TMath::Sqrt(punto[0]*punto[0] + punto[1]*punto[1]);
-                xhit2[1] = ptr3->SmearingPhi(punto[0], punto[1], 2);
-                xhit2[2] = ptr3->SmearingZ(punto[2], H);
-                xhit2[3] = tot;
+                ptr2->Scattering(versori, true);
+                ptr2->EquazioneRetta(punto, versori, ptr2->GetRLayer2());
 
-                ptr2->Scattering2(versori, false);
-                ptr2->EquazioneRetta2(punto, versori, 3);
-
-                if(-H/2. <= punto[2] && punto[2] <= H/2.){
-                    xhit3[0] = TMath::Sqrt(punto[0]*punto[0] + punto[1]*punto[1]);
-                    xhit3[1] = ptr3->SmearingPhi(punto[0], punto[1], 2);
-                    xhit3[2] = ptr3->SmearingZ(punto[2], H);
-                    xhit3[3] = tot;
+                if (-H/2. <= punto[2] && punto[2] <= H/2.) {
+                    xhitL2.r = ptr2->GetRLayer2();
+                    xhitL2.phi = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer2());
+                    xhitL2.z = ptr2->SmearingZ(punto[2]);
+                    xhitL2.etichetta = tot;
+                    T_hitL2->Fill();
                 }
 
-                hit2->Fill(xhit2);
-                if(-H/2. <= punto[2] && punto[2] <= H/2.) hit3->Fill(xhit3);
-            } 
+                T_hitL1->Fill();
+            }
         }
 
-        if(ptr3->GenRandom() < 0.0001) ptr3->Rumore(hit2, hit3, tot, true);
-
-        nt->Reset();
+        ptr2->Rumore(&xhitL1, &xhitL2, T_hitL1, T_hitL2, tot, true);
     }
 
     timer.Stop();
     timer.Print();
 
-    hit2->Write();
-    hit3->Write();
-    vrt->Write();
+    T_hitL1->Write();
+    T_hitL2->Write();
+    T_vrt->Write();
+
     fout.Purge();
     fout.Close();
 
     file->Close();
     delete file;
-
     delete ptr;
     delete ptr2;
-    delete ptr3;
 }
