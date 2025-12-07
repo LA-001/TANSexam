@@ -1,6 +1,5 @@
 #include "Trasporto.h"
 #include <TMath.h>
-#include <cmath>
 #include <Riostream.h>
 #include <TRandom3.h>
 #include <TVector3.h>
@@ -15,7 +14,7 @@ fRLayer2(70.),
 fHRiv(270.),
 fRMSspace(0.001),         // 0.001 radianti
 fRMSz(0.12),              // millimetri
-fRMSphi(0.03)            // radianti (corretto)
+fRMSphi(0.03)            // radianti
 { 
     cout<<"DEFAULT CONSTRUCTOR - this:  "<<this<<endl;
 }
@@ -49,7 +48,7 @@ void Trasporto::Condizione(double x,double y,double z,int strato, int evento){
     }
 }
 
-void Trasporto::EquazioneRetta(double punto[3], double versori[3], double R){ 
+void Trasporto::EquazioneRetta(double punto[3], const double versori[3], double R){ 
     double pv00 = punto[0]*versori[0];
     double pv11 = punto[1]*versori[1];
     double vv00 = versori[0]*versori[0];
@@ -61,9 +60,9 @@ void Trasporto::EquazioneRetta(double punto[3], double versori[3], double R){
 
     if (delta < 0) {
         cout << "Errore: delta negativo, nessuna intersezione trovata." << endl;
-        punto[0] = 10000;
-        punto[1] = 10000; 
-        punto[2] = 10000; 
+        punto[0] = 1e4;
+        punto[1] = 1e4;
+        punto[2] = 1e4;
         return;
     }
 
@@ -88,7 +87,7 @@ void Trasporto::Scattering(double versore[3], bool on){
     T[2][0] = 0.;    T[2][1] = (versore[0]*B - versore[1]*A);     T[2][2] = versore[2];
 
     double thp = fRMSspace / TMath::Sqrt(2);
-    double php = gRandom->Rndm() * 2 * M_PI;
+    double php = gRandom->Rndm() * 2 * TMath::Pi();
 
     double u[3];
     u[0] = TMath::Sin(thp) * TMath::Cos(php);
@@ -104,20 +103,20 @@ void Trasporto::Scattering(double versore[3], bool on){
 
 }
 
-double Trasporto::SmearingPhi(double x, double y, double R){
+double Trasporto::SmearingPhi(const double x, const double y, const double R){
     double k = TMath::ATan2(y, x);
-    if(k < 0) k += 2 * M_PI;
+    if(k < 0) k += 2 * TMath::Pi();
 
     double PHIrec = 0;
     PHIrec = k + gRandom->Gaus(0, fRMSphi) / R;
 
-    if(PHIrec > 2. * M_PI) PHIrec -= 2 * M_PI;
-    if(PHIrec < 0.) PHIrec += 2 * M_PI;
+    if(PHIrec > 2. * TMath::Pi()) PHIrec -= 2 * TMath::Pi();
+    if(PHIrec < 0.) PHIrec += 2 * TMath::Pi();
 
     return PHIrec;
 }
 
-double Trasporto::SmearingZ(double z){
+double Trasporto::SmearingZ(const double z){
     double zz = 0;
     zz = z + gRandom->Gaus(0, fRMSz);
     
@@ -138,15 +137,15 @@ void Trasporto::Rumore(Hit* xhitL1, Hit* xhitL2, TTree* T_hitL1, TTree* T_hitL2,
     for(int i = 0; i < 2; i++){
      
         xhitL1->r = fRLayer1;
-        xhitL1->phi = gRandom->Rndm() * 2 * M_PI;
-        xhitL1->z = gRandom->Uniform(-135., 135.);
+        xhitL1->phi = gRandom->Rndm() * 2 * TMath::Pi();
+        xhitL1->z = gRandom->Uniform(-fHRiv/2., fHRiv/2.);
         xhitL1->etichetta = et;
 
         T_hitL1->Fill();
 
         xhitL2->r = fRLayer2;
-        xhitL2->phi = gRandom->Rndm() * 2 * M_PI;
-        xhitL2->z = gRandom->Uniform(-135., 135.);
+        xhitL2->phi = gRandom->Rndm() * 2 * TMath::Pi();
+        xhitL2->z = gRandom->Uniform(-fHRiv/2., fHRiv/2.);
         xhitL2->etichetta = et;
 
         T_hitL2->Fill();

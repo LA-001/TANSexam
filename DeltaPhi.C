@@ -6,10 +6,10 @@
 #include <TStopwatch.h>
 #include "TRandom.h"
 #include "TH1D.h"
+#include "TCanvas.h"
 
 #include "Generazione.h"
 #include "Trasporto.h"
-#include "Ricostruzione.h"
 
 using namespace std;
 
@@ -36,9 +36,10 @@ void DP(int numero, unsigned int seed, bool distr_z, bool distr_m, int m){
 
     Generazione *ptr = new Generazione(eta,hm);
     Trasporto *ptr2 = new Trasporto();
-    Ricostruzione *ptr3 = new Ricostruzione();
 
     TH1D *hist = new TH1D("hist","Delta Phi",200,0,0.006);
+    hist->GetXaxis()->SetTitle("#Delta#phi [rad]");
+    hist->GetYaxis()->SetTitle("Conteggi");
 
     double x0, y0, z0, molti, phi, tetha;
     double punto[3], versori[3];
@@ -71,13 +72,13 @@ void DP(int numero, unsigned int seed, bool distr_z, bool distr_m, int m){
             ptr2->EquazioneRetta(punto, versori, ptr2->GetRLayer1());
 
             if(-H/2. <= punto[2] && punto[2] <= H/2.) {
-                Phi1 = ptr3->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer1());
+                Phi1 = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer1());
 
                 ptr2->Scattering(versori, true);
                 ptr2->EquazioneRetta(punto, versori, ptr2->GetRLayer2());
 
                 if(-H/2. <= punto[2] && punto[2] <= H/2.) {
-                    Phi2 = ptr3->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer2());
+                    Phi2 = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer2());
 
                     deltaPhi = TMath::Abs(Phi1 - Phi2);
 
@@ -91,7 +92,10 @@ void DP(int numero, unsigned int seed, bool distr_z, bool distr_m, int m){
         }
     }
 
+    TCanvas *cPhi = new TCanvas("cPhi", "cPhi", 1200, 800);
     hist->DrawCopy();
+    cPhi->SetGrid();
+    cPhi->SaveAs("Plot/cPhi_3.png");
 
     timer.Stop();
     timer.Print();
@@ -101,5 +105,4 @@ void DP(int numero, unsigned int seed, bool distr_z, bool distr_m, int m){
 
     delete ptr;
     delete ptr2;
-    delete ptr3;
 }

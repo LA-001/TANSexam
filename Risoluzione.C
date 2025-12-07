@@ -1,4 +1,4 @@
-#include <Riostream.h>
+#include "Riostream.h"
 #include "TFile.h"
 #include "TMath.h"
 #include "TCanvas.h"
@@ -108,7 +108,7 @@ void Risoluzione() {
     ris1->SetMarkerStyle(20);
     ris1->SetTitle("Risoluzione vs Molteplicita'");
     ris1->GetXaxis()->SetTitle("Molteplicita'");
-    ris1->GetYaxis()->SetTitle("Risoluzione [micron]");
+    ris1->GetYaxis()->SetTitle("Risoluzione [#mum]");
 
     ris2->SetLineColor(kGreen+3);
     ris2->SetLineWidth(1);
@@ -117,7 +117,7 @@ void Risoluzione() {
     ris2->SetMarkerStyle(20);
     ris2->SetTitle("Risoluzione vs Z_{vert}");
     ris2->GetXaxis()->SetTitle("Z_{vert} [mm]");
-    ris2->GetYaxis()->SetTitle("Risoluzione [micron]");
+    ris2->GetYaxis()->SetTitle("Risoluzione [#mum]");
 
     TCanvas *c4 = new TCanvas("c4", "c4", 900, 600);
     ris1->Draw("ACP");

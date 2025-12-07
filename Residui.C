@@ -18,7 +18,6 @@ using namespace std;
 void Residui() {
 
     TStopwatch timer;
-    timer.Start();
 
     MyEs *ptr = new MyEs();
 
@@ -47,12 +46,15 @@ void Residui() {
     T_rec2->SetBranchAddress("hitL2", &hitL2);
 
     double inter, deltaPhi = 0, A, B, C, D;
-    int lablab = -1;
+    int lab = -1;
     double media, Phi_VM = 0.004, z_max = 170., z_min = -170.;
 
     vector<double> vertice;
     vector<double> intervalloVer;
     map<int, vector<Hit>> hitsByLabel;      //map<chiave,valore> nomeMappa, uso come chiave l'etichetta int e gli aggiungo il vettore associato
+
+    timer.Start();
+
 
     for (long i = 0; i < T_rec2->GetEntries(); ++i) {
         T_rec2->GetEntry(i);
@@ -74,50 +76,53 @@ void Residui() {
     }
 
 //-----------------------------------------------------------------------------------------------------------------
-for(long ev = 0; ev < T_rec1->GetEntries(); ++ev){
-    T_rec1->GetEntry(ev);
 
-    if (lablab != hitL1.etichetta){
-        media = ptr->RunWind(vertice);
+    for(long ev = 0; ev < T_rec1->GetEntries(); ++ev){
+        T_rec1->GetEntry(ev);
 
-        if (z_min <= media && media <= z_max) {
-            T_MC->GetEntry(hitL1.etichetta - 2);
+        if (lab != hitL1.etichetta){
+            media = ptr->RunWind(vertice);
 
-            hist[0]->Fill((media - mc.z0) * 1000);
-            if (mc.moltiplicita == 6) hist[1]->Fill((media - mc.z0) * 1000);
-            if (mc.moltiplicita > 44 && mc.moltiplicita < 56) hist[2]->Fill((media - mc.z0) * 1000);
+            if (z_min <= media && media <= z_max) {
+                T_MC->GetEntry(hitL1.etichetta - 2);
 
-            xvtx.z0 = mc.z0;
-            xvtx.molti = mc.moltiplicita;
-            xvtx.zRic = media;
-            T_vtx->Fill();
+                hist[0]->Fill((media - mc.z0) * 1000);
+                if (mc.moltiplicita == 6) hist[1]->Fill((media - mc.z0) * 1000);
+                if (mc.moltiplicita > 44 && mc.moltiplicita < 56) hist[2]->Fill((media - mc.z0) * 1000);
+
+                xvtx.z0 = mc.z0;
+                xvtx.molti = mc.moltiplicita;
+                xvtx.zRic = media;
+                T_vtx->Fill();
+            }
+
+            vertice.clear();
+            lab = hitL1.etichetta;
         }
 
-        vertice.clear();
-        lablab = hitL1.etichetta;
-    }
+        A = hitL1.r;
+        B = hitL1.phi;
+        C = hitL1.z;
 
-    A = hitL1.r;
-    B = hitL1.phi;
-    C = hitL1.z;
+        map<int, vector<Hit>>::iterator it = hitsByLabel.find(hitL1.etichetta);
+        if (it != hitsByLabel.end()) {          //se .find() non ha riscontro di etichetta rilascia un iteratore speciale .end(), se così fosse non avrei nulla da cercare e dunque salta l'if
+            for (const Hit& h : it->second) {   //Per ogni elemento (Hit) contenuto nel vettore it->second, crea un riferimento costante chiamato h e fai qualcosa con esso
+                D = h.phi;
 
-    map<int, vector<Hit>>::iterator it = hitsByLabel.find(hitL1.etichetta);
-    if (it != hitsByLabel.end()) {          //se .find() non ha riscontro di etichetta rilascia un iteratore speciale .end(), se così fosse non avrei nulla da cercare e dunque salta l'if
-        for (const Hit& h : it->second) {   //Per ogni elemento (Hit) contenuto nel vettore it->second, crea un riferimento costante chiamato h e fai qualcosa con esso
-            D = h.phi;
+                deltaPhi = TMath::Abs(B - D);
+                if (deltaPhi > TMath::Pi()) deltaPhi = 2 * TMath::Pi() - deltaPhi;
 
-            deltaPhi = TMath::Abs(B - D);
-            if (deltaPhi > TMath::Pi()) deltaPhi = 2 * TMath::Pi() - deltaPhi;
-
-            if (deltaPhi <= Phi_VM) {
-                inter = ptr->Intersezione(A, C, h.r, h.z);
-                if (inter >= z_min && inter <= z_max) {
-                    vertice.push_back(inter);
+                if (deltaPhi <= Phi_VM) {
+                    inter = ptr->Intersezione(A, C, h.r, h.z);
+                    if (inter >= z_min && inter <= z_max) {
+                        vertice.push_back(inter);
+                    }
                 }
             }
         }
     }
-}
+
+    timer.Stop();
 
 //-----------------------------------------------------------------------------------------------------------------
 
@@ -128,7 +133,7 @@ for(long ev = 0; ev < T_rec1->GetEntries(); ++ev){
         snprintf(nome, 5, "c%i", i + 1);
         cv[i] = new TCanvas(nome, nome, 1200, 800);
         cv[i]->SetGrid();
-        cv[i]->SetLeftMargin(0.1);
+        cv[i]->SetLeftMargin(0.13);
         hist[i]->Fit("gaus");
         hist[i]->DrawCopy();
         hist[i]->Write();
@@ -143,6 +148,5 @@ for(long ev = 0; ev < T_rec1->GetEntries(); ++ev){
     delete fin;
     delete ptr;
 
-    timer.Stop();
     timer.Print();
 }

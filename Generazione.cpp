@@ -10,8 +10,10 @@ ClassImp(Generazione);
 Generazione::Generazione(): TObject(),
 fRMSz(0.),
 fRMSxy(0.),
-fHm(NULL),
-fEta(NULL)
+fGenMaxz(0.),
+fGenMinz(0.),
+fHm(nullptr),
+fEta(nullptr)
 { 
     cout << "DEFAULT CONSTRUCTOR - this: " << this << endl;
 }
@@ -19,6 +21,8 @@ fEta(NULL)
 Generazione::Generazione(TH1F *eta, TH1F *hm): TObject(),
 fRMSz(53.),
 fRMSxy(0.1),
+fGenMaxz(160.),
+fGenMinz(-160.),
 fHm(hm),
 fEta(eta)
 { 
@@ -35,7 +39,7 @@ int Generazione::Multiplicity(bool distr, int nScelto){
 
     if (distr == true) {
         if (nScelto == 0)
-            Multi = round(gRandom->Uniform(3, 55));
+            Multi = gRandom->Integer(53) + 3;
         else
             Multi = round(fHm->GetRandom());       
     }
@@ -47,8 +51,7 @@ int Generazione::Multiplicity(bool distr, int nScelto){
 }
 
 double Generazione::VertexSimXY(){
-    double xy = gRandom->Gaus(0., fRMSxy);
-    return xy;
+    return gRandom->Gaus(0., fRMSxy);
 }
 
 double Generazione::VertexSimZ(bool distr){
@@ -57,18 +60,17 @@ double Generazione::VertexSimZ(bool distr){
     if (distr == true) {
         z = gRandom->Gaus(0., fRMSz);
     } else {
-        z = gRandom->Uniform(-160., 160.);
+        z = gRandom->Uniform(fGenMinz, fGenMaxz);
     }
 
     return z;
 }
 
-double Generazione::Azimut(){
-    double azimut = gRandom->Rndm() * 2. * M_PI;
-    return azimut;
+double Generazione::Phi(){
+    return gRandom->Rndm() * 2. * M_PI;
 }
 
-double Generazione::Tetha(){
+double Generazione::Theta(){
     double eta = fEta->GetRandom();
     return 2. * TMath::ATan(TMath::Exp(-eta));
 }

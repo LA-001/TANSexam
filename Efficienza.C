@@ -1,4 +1,4 @@
-#include <Riostream.h>
+#include "Riostream.h"
 #include "TFile.h"
 #include "TMath.h"
 #include "TNtupleD.h"
@@ -13,9 +13,14 @@
 void Efficienza() {
 
 	TFile *fin1 = TFile::Open("fileRoot/residui.root");
+    if (!fin1 || fin1->IsZombie()) {
+        std::cerr << "Errore: file 1 non trovato.\n";
+        return;
+    }
+
     TFile *fin2 = TFile::Open("fileRoot/simulazione.root");
-    if (!fin1 || !fin2) {
-        std::cerr << "Errore: file non trovati.\n";
+    if (!fin2 || fin2->IsZombie()) {
+        std::cerr << "Errore: file 2 non trovato.\n";
         return;
     }
 
@@ -39,10 +44,10 @@ void Efficienza() {
     const double maxZ = 160;
     int bin_M, bin_V;
 
-    TH1F h_tot_M("h_tot_M","Totale;Molteplicità;Events", nBinsMolti, edgesMolti);
-    TH1F h_pass_M("h_pass_M","Passati;Molteplicità;Events", nBinsMolti, edgesMolti);
-    TH1F h_tot_V("h_tot_V","Totale;Molteplicità;Events", nBinZ, minZ, maxZ);
-    TH1F h_pass_V("h_pass_V","Passati;Molteplicità;Events", nBinZ, minZ, maxZ);
+    TH1F h_tot_M("h_tot_M","Totale;Molteplicità;Conteggi", nBinsMolti, edgesMolti);
+    TH1F h_pass_M("h_pass_M","Passati;Molteplicità;Conteggi", nBinsMolti, edgesMolti);
+    TH1F h_tot_V("h_tot_V","Totale;Molteplicità;Conteggi", nBinZ, minZ, maxZ);
+    TH1F h_pass_V("h_pass_V","Passati;Molteplicità;Conteggi", nBinZ, minZ, maxZ);
  
     for (long ev = 0; ev < T_vrt->GetEntries(); ++ev) {
         T_vrt->GetEntry(ev);

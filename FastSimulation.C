@@ -11,8 +11,6 @@
 
 using namespace std;
 
-//67599
-
 void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     TStopwatch timer;
 
@@ -49,12 +47,8 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     TTree *T_vrt = new TTree("T_vrt","TTree della VM");
     T_vrt->Branch("vrt", &xvrt, "x0/D:y0/D:z0/D:moltiplicita/I");
 
-    T_hitL1->SetAutoFlush(500000); 
-    T_hitL2->SetAutoFlush(500000);
-    T_vrt->SetAutoFlush(500000);
-
     double punto[3], versori[3];
-    double H = ptr2->GetHRiv(), phi, tetha, r;
+    double H = ptr2->GetHRiv(), phi, theta, r;
 
     timer.Start();
 
@@ -71,12 +65,12 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
         T_vrt->Fill();
 
         for (int i = 0; i < molti; ++i) {
-            phi = ptr->Azimut();
-            tetha = ptr->Tetha();
+            phi = ptr->Phi();
+            theta = ptr->Theta();
 
-            versori[0] = TMath::Sin(tetha) * TMath::Cos(phi);
-            versori[1] = TMath::Sin(tetha) * TMath::Sin(phi);
-            versori[2] = TMath::Cos(tetha);
+            versori[0] = TMath::Sin(theta) * TMath::Cos(phi);
+            versori[1] = TMath::Sin(theta) * TMath::Sin(phi);
+            versori[2] = TMath::Cos(theta);
 
             punto[0] = x0;
             punto[1] = y0;
@@ -92,6 +86,8 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
                 xhitL1.z = ptr2->SmearingZ(punto[2]);
                 xhitL1.etichetta = tot;
 
+                T_hitL1->Fill();
+
                 ptr2->Scattering(versori, true);
                 ptr2->EquazioneRetta(punto, versori, ptr2->GetRLayer2());
 
@@ -100,10 +96,9 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
                     xhitL2.phi = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer2());
                     xhitL2.z = ptr2->SmearingZ(punto[2]);
                     xhitL2.etichetta = tot;
+                    
                     T_hitL2->Fill();
                 }
-
-                T_hitL1->Fill();
             }
         }
 

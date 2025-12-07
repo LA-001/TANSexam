@@ -54,7 +54,7 @@ double MyEs::Intersezione2(double r1, double phi1, double z1, double r2, double 
     double dz = z2 - z1;
 
     double t_den = dx*dx + dy*dy;
-    if (t_den < 1e-12) return 10000.; // più robusto
+    if (t_den < 1e-12) return 10000.;
 
     double t = -(x1*dx + y1*dy) / t_den;
     double z_proj = z1 + t * dz;
