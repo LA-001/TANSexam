@@ -10,8 +10,6 @@ ClassImp(Generazione);
 Generazione::Generazione(): TObject(),
 fRMSz(0.),
 fRMSxy(0.),
-fGenMaxz(0.),
-fGenMinz(0.),
 fHm(nullptr),
 fEta(nullptr)
 { 
