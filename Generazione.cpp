@@ -21,8 +21,6 @@ fEta(nullptr)
 Generazione::Generazione(TH1F *eta, TH1F *hm): TObject(),
 fRMSz(53.),
 fRMSxy(0.1),
-fGenMaxz(160.),
-fGenMinz(-160.),
 fHm(hm),
 fEta(eta)
 { 
@@ -60,7 +58,7 @@ double Generazione::VertexSimZ(bool distr){
     if (distr == true) {
         z = gRandom->Gaus(0., fRMSz);
     } else {
-        z = gRandom->Uniform(fGenMinz, fGenMaxz);
+        z = gRandom->Uniform(-3*fRMSz, 3*fRMSz);
     }
 
     return z;
