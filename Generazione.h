@@ -24,8 +24,6 @@ private:
     // tutte le misure sono in millimetri
     double fRMSz;     // rms della normale per z
     double fRMSxy;    // rms della normale per x e y
-    double fGenMaxz;
-    double fGenMinz;
     TH1F *fHm;
     TH1F *fEta;
 
