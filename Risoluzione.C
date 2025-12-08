@@ -55,7 +55,7 @@ void Risoluzione() {
     for (int i = 0; i < nMolt; i++) {
         snprintf(nome, 15, "histo%i", i+1);
         snprintf(titolo, 50, "Istogramma residui #%i ", i+1);
-        hist[i] = new TH1D(nome, titolo, 600, -600, 600);
+        hist[i] = new TH1D(nome, titolo, 70, -700, 700);
     }
 
     for (long ev = 0; ev < T_vtx->GetEntries(); ev++) {
