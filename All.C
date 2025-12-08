@@ -23,7 +23,7 @@ void All() {
         cin>>m;           
     }
 
-    TString cmd = Form("FastSim(%d, %u, %d, %d, %d);", n, seed, (int)distr_z, (int)distr_m, m);
+    TString cmd = Form("FastSim(%d, %u, %d, %d, %d);", n, seed, (bool)distr_z, (bool)distr_m, m);
 
     gROOT->ProcessLine(".L FastSimulation.C+");
     gROOT->ProcessLine(cmd);
