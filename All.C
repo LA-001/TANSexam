@@ -1,16 +1,8 @@
-#include <TROOT.h>
+#include "TROOT.h"
+#include "TString.h"
 #include <iostream>
 
-void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m);
-void Residui();
-void Risoluzione();
-void Efficienza();
-
 void All() {
-    gROOT->ProcessLine(".L FastSimulation.C");
-    gROOT->ProcessLine(".L Residui.C");
-    gROOT->ProcessLine(".L Risoluzione.C");
-    gROOT->ProcessLine(".L Efficienza.C");
 
     int n,m;
     unsigned int seed;
@@ -31,8 +23,17 @@ void All() {
         cin>>m;           
     }
 
-    FastSim(n, seed, distr_z, distr_m, m);
-    Residui();
-    Risoluzione();
-    Efficienza();
+    TString cmd = Form("FastSim(%d, %u, %d, %d, %d);", n, seed, (int)distr_z, (int)distr_m, m);
+
+    gROOT->ProcessLine(".L FastSimulation.C+");
+    gROOT->ProcessLine(cmd);
+
+    gROOT->ProcessLine(".L Residui.C+");
+    gROOT->ProcessLine("Residui();");
+
+    gROOT->ProcessLine(".L Risoluzione.C+");
+    gROOT->ProcessLine("Risoluzione();");
+
+    gROOT->ProcessLine(".L Efficienza.C+");
+    gROOT->ProcessLine("Efficienza();");
 }
