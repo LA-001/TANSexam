@@ -46,8 +46,8 @@ void Efficienza() {
 
     TH1F h_tot_M("h_tot_M","Totale;Molteplicità;Conteggi", nBinsMolti, edgesMolti);
     TH1F h_pass_M("h_pass_M","Passati;Molteplicità;Conteggi", nBinsMolti, edgesMolti);
-    TH1F h_tot_V("h_tot_V","Totale;Molteplicità;Conteggi", nBinZ, minZ, maxZ);
-    TH1F h_pass_V("h_pass_V","Passati;Molteplicità;Conteggi", nBinZ, minZ, maxZ);
+    TH1F h_tot_V("h_tot_V","Totale;Vertice;Conteggi", nBinZ, minZ, maxZ);
+    TH1F h_pass_V("h_pass_V","Passati;Vertice;Conteggi", nBinZ, minZ, maxZ);
  
     for (long ev = 0; ev < T_vrt->GetEntries(); ++ev) {
         T_vrt->GetEntry(ev);
