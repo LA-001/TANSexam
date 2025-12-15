@@ -47,7 +47,7 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     TTree *T_vrt = new TTree("T_vrt","TTree della VM");
     T_vrt->Branch("vrt", &xvrt, "x0/D:y0/D:z0/D:moltiplicita/I");
 
-    double H = ptr2->GetHRiv(), phi, theta, r;
+    double H = ptr2->GetHRiv();
 
     timer.Start();
 
@@ -63,8 +63,8 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
         double punto[3], versori[3];
 
         for (int i = 0; i < molti; ++i) {
-            phi = ptr->Phi();
-            theta = ptr->Theta();
+            double phi = ptr->Phi();
+            double theta = ptr->Theta();
 
             versori[0] = TMath::Sin(theta) * TMath::Cos(phi);
             versori[1] = TMath::Sin(theta) * TMath::Sin(phi);
