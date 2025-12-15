@@ -89,9 +89,7 @@ void Residui() {
                 if (mc.moltiplicita == 6) hist[1]->Fill((media - mc.z0) * 1000);
                 if (mc.moltiplicita > 44 && mc.moltiplicita < 56) hist[2]->Fill((media - mc.z0) * 1000);
 
-                xvtx.z0 = mc.z0;
-                xvtx.molti = mc.moltiplicita;
-                xvtx.zRic = media;
+                xvtx = {mc.z0, media, mc.moltiplicita};
                 T_vtx->Fill();
             }
 
