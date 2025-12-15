@@ -47,7 +47,6 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     TTree *T_vrt = new TTree("T_vrt","TTree della VM");
     T_vrt->Branch("vrt", &xvrt, "x0/D:y0/D:z0/D:moltiplicita/I");
 
-    double punto[3], versori[3];
     double H = ptr2->GetHRiv(), phi, theta, r;
 
     timer.Start();
@@ -58,11 +57,10 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
         double z0 = ptr->VertexSimZ(distr_z);
         int molti = ptr->Multiplicity(distr_m, m);
 
-        xvrt.x0 = x0;
-        xvrt.y0 = y0;
-        xvrt.z0 = z0;
-        xvrt.moltiplicita = molti;
+        xvrt = {x0, y0, z0, molti};
         T_vrt->Fill();
+
+        double punto[3], versori[3];
 
         for (int i = 0; i < molti; ++i) {
             phi = ptr->Phi();
