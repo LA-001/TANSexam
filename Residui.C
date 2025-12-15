@@ -54,7 +54,6 @@ void Residui() {
 
     timer.Start();
 
-
     for (long i = 0; i < T_rec2->GetEntries(); ++i) {
         T_rec2->GetEntry(i);
         hitsByLabel[hitL2.etichetta].push_back(hitL2);        //nomeMappa[chiave].push_back(vettore), è come se mi creasse una tabella con una colonna le chiavi e un'altra i vettori
