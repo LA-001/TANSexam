@@ -45,9 +45,8 @@ void Residui() {
     T_rec1->SetBranchAddress("hitL1", &hitL1);
     T_rec2->SetBranchAddress("hitL2", &hitL2);
 
-    double inter, deltaPhi = 0, A, B, C, D;
     int lab = -1;
-    double media, Phi_VM = 0.004, z_max = 170., z_min = -170.;
+    double Phi_VM = 0.004, z_max = 170., z_min = -170.;
 
     vector<double> vertice;
     vector<double> intervalloVer;
@@ -81,7 +80,7 @@ void Residui() {
         T_rec1->GetEntry(ev);
 
         if (lab != hitL1.etichetta){
-            media = ptr->RunWind(vertice);
+            double media = ptr->RunWind(vertice);
 
             if (z_min <= media && media <= z_max) {
                 T_MC->GetEntry(hitL1.etichetta - 2);
@@ -100,20 +99,20 @@ void Residui() {
             lab = hitL1.etichetta;
         }
 
-        A = hitL1.r;
-        B = hitL1.phi;
-        C = hitL1.z;
+        double A = hitL1.r;
+        double B = hitL1.phi;
+        double C = hitL1.z;
 
         map<int, vector<Hit>>::iterator it = hitsByLabel.find(hitL1.etichetta);
         if (it != hitsByLabel.end()) {          //se .find() non ha riscontro di etichetta rilascia un iteratore speciale .end(), se così fosse non avrei nulla da cercare e dunque salta l'if
             for (const Hit& h : it->second) {   //Per ogni elemento (Hit) contenuto nel vettore it->second, crea un riferimento costante chiamato h e fai qualcosa con esso
-                D = h.phi;
+                double D = h.phi;
 
-                deltaPhi = TMath::Abs(B - D);
+                double deltaPhi = TMath::Abs(B - D);
                 if (deltaPhi > TMath::Pi()) deltaPhi = 2 * TMath::Pi() - deltaPhi;
 
                 if (deltaPhi <= Phi_VM) {
-                    inter = ptr->Intersezione(A, C, h.r, h.z);
+                    double inter = ptr->Intersezione(A, C, h.r, h.z);
                     if (inter >= z_min && inter <= z_max) {
                         vertice.push_back(inter);
                     }
