@@ -5,6 +5,7 @@
 #include "TLegend.h"
 #include "TGraphErrors.h"
 #include "TH1D.h"
+#include "TH2D.h"
 #include "TF1.h"
 #include "TStopwatch.h"
 #include "TTree.h"
@@ -28,75 +29,58 @@ void Risoluzione() {
     
     T_vtx->SetBranchAddress("vtx", &vertex);
 
+    TH2D *hist2D_M = new TH2D("hist2D_M","Istogramma 2D - Residui vs Molteplicita'",60,0.5,60.5,600,-650.,650.);
+    hist2D_M->GetXaxis()->SetTitle("Molteplicita'");
+    hist2D_M->GetYaxis()->SetTitle("Residui [#mum]");
+    TH2D *hist2D_V = new TH2D("hist2D_V","Istogramma 2D - Residui vs Z_{vert}",340,170.,170.,600,-650.,650.);
+    hist2D_V->GetXaxis()->SetTitle("Z_{vert} [mm]");
+    hist2D_V->GetYaxis()->SetTitle("Residui [#mum]");
+
     const int nMolt = 11, nVer = 9;
-    int inizio = -160;
-
-    TH1D *hist[nMolt];
-    TH1D *hist_v[nVer];
-    char titolo[50];
-    char nome[30];
-
-    TCanvas *cv[nVer];
-
+ 
     double molteplicita[nMolt] = { 5., 7., 9., 12., 15., 18., 22., 26., 32., 40., 48. };
     double deltaM[nMolt] = { 0.5, 0.5, 0.5, 0.5 ,1. ,1.  ,2.  ,2.  ,3.  ,3., 4. };
 
-    double vertice[nVer];
-    double deltaV[nVer];
-
-    for (int i = 0; i < nVer; i++) {
-        vertice[i] = inizio;
-        inizio += 40;
-        deltaV[i] = 10;
-    }
+    double vertice[nVer] = {-160., -120., -80., -40., 0., 40., 80., 120., 160.};
+    double deltaV[nVer] = {10., 10., 10., 10., 10., 10., 10., 10., 10.};
 
     double y1[nMolt], y2[nVer], ey1[nMolt], ey2[nVer];
 
-    for (int i = 0; i < nMolt; i++) {
-        snprintf(nome, 15, "histo%i", i+1);
-        snprintf(titolo, 50, "Istogramma residui #%i ", i+1);
-        hist[i] = new TH1D(nome, titolo, 70, -700, 700);
-    }
-
     for (long ev = 0; ev < T_vtx->GetEntries(); ev++) {
         T_vtx->GetEntry(ev);
-        for (int i = 0; i < nMolt; i++) {
-            if (-159. <= vertex.z0 && vertex.z0 <= 159.) {
-                if ((molteplicita[i] - deltaM[i]) <= vertex.molti &&
-                    vertex.molti <= (molteplicita[i] + deltaM[i])) {
-                    hist[i]->Fill((vertex.zRic - vertex.z0) * 1000);
-                }
-            }
-        }
+        hist2D_M->Fill(vertex.molti, (vertex.zRic - vertex.z0) * 1000);
+        hist2D_V->Fill(vertex.z0, (vertex.zRic - vertex.z0) * 1000);
     }
 
     for (int i = 0; i < nMolt; i++) {
-        y1[i] = hist[i]->GetStdDev();
-        ey1[i] = hist[i]->GetStdDevError();
+
+        int binM_min = hist2D_M->GetXaxis()->FindBin(molteplicita[i] - deltaM[i]);
+        int binM_max = hist2D_M->GetXaxis()->FindBin(molteplicita[i] + deltaM[i]);
+
+        TH1D *proj_M = hist2D_M->ProjectionY(Form("proj_M_%d", i), binM_min, binM_max);
+        proj_M->SetDirectory(0);
+
+        y1[i]  = proj_M->GetStdDev();
+        ey1[i] = proj_M->GetStdDevError();
+
+        delete proj_M;
     }
+
 
     for (int i = 0; i < nVer; i++) {
-        snprintf(nome, 15, "histo_v%i", i+1);
-        snprintf(titolo, 50, "Istogramma residui vs Z_{true} #%i ", i+1);
-        hist_v[i] = new TH1D(nome, titolo, 70, -700, 700);
+
+        int binV_min = hist2D_V->GetXaxis()->FindBin(vertice[i] - deltaV[i]);
+        int binV_max = hist2D_V->GetXaxis()->FindBin(vertice[i] + deltaV[i]);
+
+        TH1D *proj_V = hist2D_V->ProjectionY(Form("proj_V_%d", i),binV_min,binV_max);
+        proj_V->SetDirectory(0);
+
+        y2[i]  = proj_V->GetStdDev();
+        ey2[i] = proj_V->GetStdDevError();
+
+        delete proj_V;
     }
 
-    for (long ev = 0; ev < T_vtx->GetEntries(); ev++) {
-        T_vtx->GetEntry(ev);
-        for (int i = 0; i < nVer; i++) {
-            if (-159. <= vertex.z0 && vertex.z0 <= 159.) {
-                if ((vertice[i] - deltaV[i]) <= vertex.z0 &&
-                    vertex.z0 <= (vertice[i] + deltaV[i])) {
-                    hist_v[i]->Fill((vertex.zRic - vertex.z0) * 1000);
-                }
-            }
-        }
-    }
-
-    for (int i = 0; i < nVer; i++) {
-        y2[i] = hist_v[i]->GetStdDev();
-        ey2[i] = hist_v[i]->GetStdDevError();
-    }
 
     TGraphErrors* ris1 = new TGraphErrors(nMolt, molteplicita, y1, deltaM, ey1);
     TGraphErrors* ris2 = new TGraphErrors(nVer, vertice, y2, deltaV, ey2);
@@ -128,4 +112,15 @@ void Risoluzione() {
     ris2->Draw("ALP");
     c5->SetGrid();
     c5->SaveAs("Plot/c5.png");
+
+    TCanvas *c4_2 = new TCanvas("c4_2", "c4_2", 900, 600);
+    hist2D_M->SetStats(0);
+    hist2D_M->Draw("COLZ");
+    c4_2->SaveAs("Plot/c4_2.png");
+
+    TCanvas *c5_2 = new TCanvas("c5_2", "c5_2", 900, 600);
+    hist2D_V->SetStats(0);
+    hist2D_V->Draw("COLZ");
+    c5_2->SaveAs("Plot/c5_2.png");
+
 }
