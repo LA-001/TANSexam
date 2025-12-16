@@ -96,20 +96,18 @@ void Residui() {
             lab = hitL1.etichetta;
         }
 
-        double A = hitL1.r;
-        double B = hitL1.phi;
-        double C = hitL1.z;
+        double phi_L1 = hitL1.phi;
 
         map<int, vector<Hit>>::iterator it = hitsByLabel.find(hitL1.etichetta);
         if (it != hitsByLabel.end()) {          //se .find() non ha riscontro di etichetta rilascia un iteratore speciale .end(), se così fosse non avrei nulla da cercare e dunque salta l'if
             for (const Hit& h : it->second) {   //Per ogni elemento (Hit) contenuto nel vettore it->second, crea un riferimento costante chiamato h e fai qualcosa con esso
-                double D = h.phi;
+                double phi_L2 = h.phi;
 
-                double deltaPhi = TMath::Abs(B - D);
+                double deltaPhi = TMath::Abs(phi_L1 - phi_L2);
                 if (deltaPhi > TMath::Pi()) deltaPhi = 2 * TMath::Pi() - deltaPhi;
 
                 if (deltaPhi <= Phi_VM) {
-                    double inter = ptr->Intersezione(A, C, h.r, h.z);
+                    double inter = ptr->Intersezione(hitL1.r, hitL1.z, h.r, h.z);
                     if (inter >= z_min && inter <= z_max) {
                         vertice.push_back(inter);
                     }
