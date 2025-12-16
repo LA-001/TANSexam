@@ -41,23 +41,22 @@ void DP(int numero, unsigned int seed, bool distr_z, bool distr_m, int m){
     hist->GetXaxis()->SetTitle("#Delta#phi [rad]");
     hist->GetYaxis()->SetTitle("Conteggi");
 
-    double x0, y0, z0, molti, phi, tetha;
-    double punto[3], versori[3];
     double H = ptr2->GetHRiv();
-    double Phi1, Phi2, deltaPhi;
 
     timer.Start();
 
     for(int tot = 1; tot <= numero; tot++){	  
 
-        x0 = ptr->VertexSimXY();  
-        y0 = ptr->VertexSimXY();  
-        z0 = ptr->VertexSimZ(distr_z);   
-        molti = ptr->Multiplicity(distr_m, m); 
+        double x0 = ptr->VertexSimXY();  
+        double y0 = ptr->VertexSimXY();  
+        double z0 = ptr->VertexSimZ(distr_z);   
+        int molti = ptr->Multiplicity(distr_m, m); 
+
+        double punto[3], versori[3];
 
         for(int i = 0; i < molti; i++){
-            phi = ptr->Azimut();
-            tetha = ptr->Tetha();
+            double phi = ptr->Azimut();
+            double tetha = ptr->Tetha();
 
             versori[0] = TMath::Sin(tetha) * TMath::Cos(phi);
             versori[1] = TMath::Sin(tetha) * TMath::Sin(phi);
@@ -72,15 +71,15 @@ void DP(int numero, unsigned int seed, bool distr_z, bool distr_m, int m){
             ptr2->EquazioneRetta(punto, versori, ptr2->GetRLayer1());
 
             if(-H/2. <= punto[2] && punto[2] <= H/2.) {
-                Phi1 = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer1());
+                double Phi1 = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer1());
 
                 ptr2->Scattering(versori, true);
                 ptr2->EquazioneRetta(punto, versori, ptr2->GetRLayer2());
 
                 if(-H/2. <= punto[2] && punto[2] <= H/2.) {
-                    Phi2 = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer2());
+                    double Phi2 = ptr2->SmearingPhi(punto[0], punto[1], ptr2->GetRLayer2());
 
-                    deltaPhi = TMath::Abs(Phi1 - Phi2);
+                    double deltaPhi = TMath::Abs(Phi1 - Phi2);
 
                     if (deltaPhi > M_PI) {
                         deltaPhi = 2 * M_PI - deltaPhi;
