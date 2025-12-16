@@ -32,7 +32,7 @@ void Risoluzione() {
     TH2D *hist2D_M = new TH2D("hist2D_M","Istogramma 2D - Residui vs Molteplicita'",60,0.5,60.5,600,-650.,650.);
     hist2D_M->GetXaxis()->SetTitle("Molteplicita'");
     hist2D_M->GetYaxis()->SetTitle("Residui [#mum]");
-    TH2D *hist2D_V = new TH2D("hist2D_V","Istogramma 2D - Residui vs Z_{vert}",340,170.,170.,600,-650.,650.);
+    TH2D *hist2D_V = new TH2D("hist2D_V","Istogramma 2D - Residui vs Z_{vert}",340,-170.,170.,600,-650.,650.);
     hist2D_V->GetXaxis()->SetTitle("Z_{vert} [mm]");
     hist2D_V->GetYaxis()->SetTitle("Residui [#mum]");
 
