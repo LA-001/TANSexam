@@ -63,7 +63,7 @@ void Efficienza() {
 
     TEfficiency* eff = new TEfficiency(h_pass_M, h_tot_M);
     eff->SetName("eff");
-    eff->SetTitle("Efficienza vs molteplicita'; Molteplicità; #epsilon");
+    eff->SetTitle("Efficienza vs molteplicita'; Molteplicita'; #epsilon");
     TEfficiency* eff_v = new TEfficiency(h_pass_V, h_tot_V);
     eff_v->SetName("eff_v");
     eff_v->SetTitle("Efficienza vs Z_{true}; Z_{true} [mm]; #epsilon");
