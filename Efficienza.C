@@ -41,8 +41,8 @@ void Efficienza() {
     T_vtx->SetBranchAddress("vtx", &vertex);
     T_vrt->SetBranchAddress("vrt", &MC);
 
-	const double edgesMolti[14] = {2, 4, 6, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55};
-	const int nBinsMolti = 14;
+	const double edgesMolti[] = {2, 4, 6, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55};
+	const int nBinsMolti = sizeof(edgesMolti)/sizeof(edgesMolti[0]) - 1;
 
     const int nBinZ = 16;
     const double minZ = -160;
