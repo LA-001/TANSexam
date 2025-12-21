@@ -24,8 +24,6 @@ void Residui() {
     TFile *fin = TFile::Open("fileRoot/simulazione.root");
     if (!fin || fin->IsZombie()) {
         cout << "Errore: impossibile aprire il file ROOT." << endl;
-        fin->Close();
-        delete fin;
         return;
     }
 
