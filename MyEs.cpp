@@ -2,10 +2,6 @@
 #include <vector>
 #include <TMath.h>
 #include <Riostream.h>
-#include <TNtuple.h>
-#include "TH1F.h"
-#include "TCanvas.h"
-#include "TSpectrum.h"
 
 ClassImp(MyEs);
 
