@@ -16,14 +16,14 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
 
     TFile *file = TFile::Open("fileRoot/kinem.root");
     if (!file || file->IsZombie()) {
-        cerr << "Errore: impossibile aprire il file ROOT." << endl;
+        cout << "Errore: impossibile aprire il file ROOT." << endl;
         return;
     }
     
     TH1F *hm = (TH1F*)file->Get("hm");
     TH1F *eta = (TH1F*)file->Get("heta2");
     if (!hm || !eta) {
-        cerr << "Errore: istogrammi 'hm' o 'heta2' non trovati." << endl;
+        cout << "Errore: istogrammi 'hm' o 'heta2' non trovati." << endl;
         file->Close();
         return;
     }
