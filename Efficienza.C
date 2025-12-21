@@ -4,7 +4,7 @@
 #include "TNtupleD.h"
 #include "TCanvas.h"
 #include "TGraphAsymmErrors.h"
-#include "TH1F.h"
+#include "TH1D.h"
 #include "TStopwatch.h"
 #include "TEfficiency.h"
 
@@ -42,17 +42,17 @@ void Efficienza() {
     T_vtx->SetBranchAddress("vtx", &vertex);
     T_vrt->SetBranchAddress("vrt", &MC);
 
-	double edgesMolti[14] = {2, 4, 6, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55};
+	const double edgesMolti[14] = {2, 4, 6, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55};
 	const int nBinsMolti = 14;
 
     const int nBinZ = 16;
     const double minZ = -160;
     const double maxZ = 160;
 
-    TH1F h_tot_M("h_tot_M","Totale;Molteplicità;Conteggi", nBinsMolti, edgesMolti);
-    TH1F h_pass_M("h_pass_M","Passati;Molteplicità;Conteggi", nBinsMolti, edgesMolti);
-    TH1F h_tot_V("h_tot_V","Totale;Vertice;Conteggi", nBinZ, minZ, maxZ);
-    TH1F h_pass_V("h_pass_V","Passati;Vertice;Conteggi", nBinZ, minZ, maxZ);
+    TH1D h_tot_M("h_tot_M","Totale;Molteplicità;Conteggi", nBinsMolti, edgesMolti);
+    TH1D h_pass_M("h_pass_M","Passati;Molteplicità;Conteggi", nBinsMolti, edgesMolti);
+    TH1D h_tot_V("h_tot_V","Totale;Vertice;Conteggi", nBinZ, minZ, maxZ);
+    TH1D h_pass_V("h_pass_V","Passati;Vertice;Conteggi", nBinZ, minZ, maxZ);
  
     for (long ev = 0; ev < T_vrt->GetEntries(); ++ev) {
         T_vrt->GetEntry(ev);
