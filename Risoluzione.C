@@ -12,16 +12,20 @@
 
 #include "Defstruct.h"
 
+using namespace std;
+
 void Risoluzione() {
     TFile *fin = TFile::Open("fileRoot/residui.root");
     if (!fin || fin->IsZombie()) {
-        std::cerr << "Errore nell'aprire fileRoot/output.root\n";
+        cout << "Errore: impossibile aprire il file ROOT." << endl;
         return;
     }
 
     TTree *T_vtx = (TTree*)fin->Get("T_vtx");
     if (!T_vtx) {
-        std::cerr << "TTree 'T_vtx' non trovato\n";
+        cout << "Errore: TTree non trovato" << endl;
+        fin->Close();
+        delete fin;
         return;
     }
 
