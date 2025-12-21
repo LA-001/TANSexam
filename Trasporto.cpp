@@ -2,8 +2,6 @@
 #include <TMath.h>
 #include <Riostream.h>
 #include <TRandom3.h>
-#include <TVector3.h>
-#include <vector>
 
 ClassImp(Trasporto);
 
