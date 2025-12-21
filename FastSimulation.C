@@ -47,7 +47,7 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     TTree *T_vrt = new TTree("T_vrt","TTree della VM");
     T_vrt->Branch("vrt", &xvrt, "x0/D:y0/D:z0/D:moltiplicita/I");
 
-    double H = ptr2->GetHRiv();
+    const double H = ptr2->GetHRiv();
 
     timer.Start();
 
