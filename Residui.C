@@ -7,7 +7,6 @@
 #include "TStopwatch.h"
 #include "TStyle.h"
 
-#include <vector>
 #include <map>
 
 #include "MyEs.h"
