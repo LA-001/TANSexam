@@ -1,7 +1,7 @@
 #ifndef GENERAZIONE_H
 #define GENERAZIONE_H
 
-#include "TObject.h"
+#include <TObject.h>
 #include <TH1F.h>
 
 class Generazione : public TObject {
