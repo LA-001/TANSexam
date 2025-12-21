@@ -51,7 +51,7 @@ void Residui() {
     T_rec2->SetBranchAddress("hitL2", &hitL2);
 
     int lab = -1;
-    double Phi_VM = 0.004, z_max = 170., z_min = -170.;
+    const double Phi_VM = 0.004, z_max = 170., z_min = -170.;
 
     vector<double> vertice;
     vector<double> intervalloVer;
