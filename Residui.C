@@ -39,6 +39,13 @@ void Residui() {
     TTree *T_MC = (TTree*)fin->Get("T_vrt");
     TTree *T_rec1 = (TTree*)fin->Get("T_hitL1");
     TTree *T_rec2 = (TTree*)fin->Get("T_hitL2");
+    if (!T_MC || !T_rec1 || !T_rec2) {
+        cout << "Errore: uno o più TTree non trovati nel file." << endl;
+        fin->Close();
+        delete fin;
+        return;
+    }
+
     T_MC->SetBranchAddress("vrt", &mc);
     T_rec1->SetBranchAddress("hitL1", &hitL1);
     T_rec2->SetBranchAddress("hitL2", &hitL2);
