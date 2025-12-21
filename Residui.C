@@ -1,12 +1,11 @@
-#include "Riostream.h"
-#include "TFile.h"
-#include "TMath.h"
-#include "TTree.h"
-#include "TCanvas.h"
-#include "TH1D.h"
-#include "TStopwatch.h"
-#include "TStyle.h"
-
+#include <Riostream.h>
+#include <TFile.h>
+#include <TMath.h>
+#include <TTree.h>
+#include <TCanvas.h>
+#include <TH1D.h>
+#include <TStopwatch.h>
+#include <TStyle.h>
 #include <map>
 
 #include "MyEs.h"
