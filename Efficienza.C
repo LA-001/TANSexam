@@ -10,24 +10,30 @@
 
 #include "Defstruct.h"
 
+using namespace std;
+
 void Efficienza() {
 
 	TFile *fin1 = TFile::Open("fileRoot/residui.root");
     if (!fin1 || fin1->IsZombie()) {
-        std::cerr << "Errore: file 1 non trovato.\n";
+        cout << "Errore: impossibile aprire il file ROOT." << endl;
         return;
     }
 
     TFile *fin2 = TFile::Open("fileRoot/simulazione.root");
     if (!fin2 || fin2->IsZombie()) {
-        std::cerr << "Errore: file 2 non trovato.\n";
+        cout << "Errore: impossibile aprire il file ROOT." << endl;
         return;
     }
 
     TTree *T_vtx = (TTree*)fin1->Get("T_vtx");
     TTree *T_vrt = (TTree*)fin2->Get("T_vrt");
     if (!T_vtx || !T_vrt) {
-        std::cerr << "Errore: TTree non trovati.\n";
+        cout << "Errore: TTree non trovati." << endl;
+		fin1->Close();
+		fin2->Close();
+		delete fin1;
+		delete fin2;
         return;
     }
 
