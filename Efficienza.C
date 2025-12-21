@@ -1,12 +1,11 @@
-#include "Riostream.h"
-#include "TFile.h"
-#include "TMath.h"
-#include "TNtupleD.h"
-#include "TCanvas.h"
-#include "TGraphAsymmErrors.h"
-#include "TH1D.h"
-#include "TStopwatch.h"
-#include "TEfficiency.h"
+#include <Riostream.h>
+#include <TFile.h>
+#include <TMath.h>
+#include <TTree.h>
+#include <TCanvas.h>
+#include <TH1D.h>
+#include <TStopwatch.h>
+#include <TEfficiency.h>
 
 #include "Defstruct.h"
 
