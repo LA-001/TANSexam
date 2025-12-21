@@ -1,7 +1,7 @@
 #ifndef MYES_H
 #define MYES_H
 
-#include "TObject.h"
+#include <TObject.h>
 
 class MyEs : public TObject{
 
