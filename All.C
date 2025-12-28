@@ -25,15 +25,18 @@ void All() {
 
     TString cmd = Form("FastSim(%d, %u, %d, %d, %d);", n, seed, (bool)distr_z, (bool)distr_m, m);
 
-    gROOT->ProcessLine(".L FastSimulation.C+");
+    gROOT->ProcessLine(".L Generazione.cpp++");
+    gROOT->ProcessLine(".L Trasporto.cpp++");
+    gROOT->ProcessLine(".L MyEs.cpp++");
+
+
+    gROOT->ProcessLine(".L FastSimulation.C++");
+    gROOT->ProcessLine(".L Residui.C++");
+    gROOT->ProcessLine(".L Risoluzione.C++");
+    gROOT->ProcessLine(".L Efficienza.C++");
+
     gROOT->ProcessLine(cmd);
-
-    gROOT->ProcessLine(".L Residui.C+");
     gROOT->ProcessLine("Residui();");
-
-    gROOT->ProcessLine(".L Risoluzione.C+");
     gROOT->ProcessLine("Risoluzione();");
-
-    gROOT->ProcessLine(".L Efficienza.C+");
     gROOT->ProcessLine("Efficienza();");
 }
