@@ -84,7 +84,7 @@ void Trasporto::Scattering(double versore[3], bool on){
     T[1][0] = B;     T[1][1] = versore[2]*A;                      T[1][2] = versore[1];
     T[2][0] = 0.;    T[2][1] = (versore[0]*B - versore[1]*A);     T[2][2] = versore[2];
 
-    double thp = fRMSspace / TMath::Sqrt(2);
+    double thp = fRMSspace;
     double php = gRandom->Rndm() * 2 * TMath::Pi();
 
     double u[3];
