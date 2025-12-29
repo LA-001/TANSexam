@@ -55,8 +55,8 @@ void DP(int numero, unsigned int seed, bool distr_z, bool distr_m, int m){
         double punto[3], versori[3];
 
         for(int i = 0; i < molti; i++){
-            double phi = ptr->Azimut();
-            double tetha = ptr->Tetha();
+            double phi = ptr->Phi();
+            double tetha = ptr->Theta();
 
             versori[0] = TMath::Sin(tetha) * TMath::Cos(phi);
             versori[1] = TMath::Sin(tetha) * TMath::Sin(phi);
