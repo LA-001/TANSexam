@@ -1,7 +1,7 @@
 #include <Riostream.h>
 #include <TFile.h>
 #include <TMath.h>
-#include <TNtupleD.h>
+#include <TTree.h>
 #include <TLeaf.h>
 #include <TStopwatch.h>
 #include <TRandom.h>
