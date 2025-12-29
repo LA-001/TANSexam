@@ -114,7 +114,7 @@ double Trasporto::SmearingPhi(const double x, const double y, const double R) co
     return PHIrec;
 }
 
-double Trasporto::SmearingZ(const double z){
+double Trasporto::SmearingZ(const double z) const{
     double zz = 0;
     zz = z + gRandom->Gaus(0, fRMSz);
     
@@ -124,7 +124,7 @@ double Trasporto::SmearingZ(const double z){
     return zz;
 }
 
-double Trasporto::GenRandom(){
+double Trasporto::GenRandom() const{
     return gRandom->Rndm();
 }
 
