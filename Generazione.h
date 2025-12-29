@@ -11,11 +11,11 @@ public:
     Generazione(TH1F *eta, TH1F *hm);
     virtual ~Generazione();
 
-    double VertexSimXY();
-    double VertexSimZ(bool distr);
-    int Multiplicity(bool distr, int ndistr);
-    double Phi();
-    double Theta();
+    int Multiplicity(bool distr, int nScelto) const;
+    double VertexSimXY() const;
+    double VertexSimZ(bool distr) const;
+    double Phi() const;
+    double Theta() const;
 
 private:
     Generazione(const Generazione& source);
