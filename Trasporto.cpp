@@ -22,7 +22,7 @@ Trasporto::~Trasporto()
     cout<<"DESTRUCTOR - this:  "<<this<<endl;
 }
 
-void Trasporto::Condizione(double x,double y,double z,int strato, int evento){
+void Trasporto::Condizione(double x,double y,double z,int strato, int evento) const{
     double k = TMath::Sqrt(x*x + y*y);
     if (strato == 1) {
         if (k >= (fRPipe-0.01) && k <= (fRPipe+0.01)) {
@@ -46,7 +46,7 @@ void Trasporto::Condizione(double x,double y,double z,int strato, int evento){
     }
 }
 
-void Trasporto::EquazioneRetta(double punto[3], const double versori[3], double R){ 
+void Trasporto::EquazioneRetta(double punto[3], const double versori[3], double R) const{ 
     double pv00 = punto[0]*versori[0];
     double pv11 = punto[1]*versori[1];
     double vv00 = versori[0]*versori[0];
@@ -72,7 +72,7 @@ void Trasporto::EquazioneRetta(double punto[3], const double versori[3], double 
     
 }
 
-void Trasporto::Scattering(double versore[3], bool on){
+void Trasporto::Scattering(double versore[3], bool on) const{
     if (!on) return;        // nel caso fosse false non si ha MCS, non cambia l'array versore
 
     double T[3][3];
@@ -101,7 +101,7 @@ void Trasporto::Scattering(double versore[3], bool on){
 
 }
 
-double Trasporto::SmearingPhi(const double x, const double y, const double R){
+double Trasporto::SmearingPhi(const double x, const double y, const double R) const{
     double k = TMath::ATan2(y, x);
     if(k < 0) k += 2 * TMath::Pi();
 
