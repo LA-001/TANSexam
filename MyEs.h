@@ -9,10 +9,10 @@ public:
 MyEs();
 virtual ~MyEs();
 
-double MediaVector(const vector<double>& vec1);
-double Intersezione(double r1, double z1, double r2, double z2);
-double Intersezione2(double r1, double phi1, double z1, double r2, double phi2, double z2);
-double RunWind(const std::vector<double>& vertice);
+double MediaVector(const vector<double>& vec1) const;
+double Intersezione(double r1, double z1, double r2, double z2) const;
+double Intersezione2(double r1, double phi1, double z1, double r2, double phi2, double z2) const;
+double RunWind(const std::vector<double>& vertice) const;
 
 private:
 MyEs(const MyEs& source);
