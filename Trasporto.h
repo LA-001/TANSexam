@@ -13,17 +13,20 @@ public:
     Trasporto();
     virtual ~Trasporto();
 
-    void Condizione(double x, double y, double z, int strato, int evento);
-    void EquazioneRetta(double punto[3], const double versori[3], double R);
-    void Scattering(double versori[3], bool on);
+    void Condizione(double x, double y, double z, int strato, int evento) const;
+    void EquazioneRetta(double punto[3], const double versori[3], double R) const;
+    void Scattering(double versori[3], bool on) const;
+
     double GetHRiv() const { return fHRiv; }
     double GetRPipe() const { return fRPipe; }
     double GetRLayer1() const { return fRLayer1; }
     double GetRLayer2() const { return fRLayer2; }
-    double SmearingPhi(const double x, const double y, const double R);
-    double SmearingZ(const double z);
+
+    double SmearingPhi(double x, double y, double R) const;
+    double SmearingZ(double z) const;
+    double GenRandom() const;
+
     void Rumore(Hit* xhit2, Hit* xhit3, TTree* hit2, TTree* hit3, int et, bool on);
-    double GenRandom();
 
 
 private:
