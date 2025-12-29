@@ -6,13 +6,13 @@
 ClassImp(Trasporto);
 
 Trasporto::Trasporto(): TObject(),
-fRPipe(30.),             
-fRLayer1(40.),     
-fRLayer2(70.),           
-fHRiv(270.),
+fRPipe(30.),              // millimetri
+fRLayer1(40.),            // millimetri
+fRLayer2(70.),            // millimetri
+fHRiv(270.),              // millimetri
 fRMSspace(0.001),         // 0.001 radianti
-fRMSz(0.12),              // millimetri
-fRMSphi(0.03)            // radianti
+fRMSz(0.12),              // millimetri (120 micron)
+fRMSphi(0.03)             // radianti
 { 
     cout<<"DEFAULT CONSTRUCTOR - this:  "<<this<<endl;
 }
@@ -73,7 +73,7 @@ void Trasporto::EquazioneRetta(double punto[3], const double versori[3], double 
 }
 
 void Trasporto::Scattering(double versore[3], bool on){
-    if (!on) return;        \\ nel caso fosse false no si ha MCS, non cambia il vettore versore
+    if (!on) return;        // nel caso fosse false non si ha MCS, non cambia il vettore versore
 
     double T[3][3];
 
@@ -84,7 +84,7 @@ void Trasporto::Scattering(double versore[3], bool on){
     T[1][0] = B;     T[1][1] = versore[2]*A;                      T[1][2] = versore[1];
     T[2][0] = 0.;    T[2][1] = (versore[0]*B - versore[1]*A);     T[2][2] = versore[2];
 
-    double thp = fRMSspace;
+    double thp = fRMSspace;        // valutando vettori nello spazio 3D devo usare l'angolo spaziale e non quello planare
     double php = gRandom->Rndm() * 2 * TMath::Pi();
 
     double u[3];
