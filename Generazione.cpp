@@ -30,7 +30,7 @@ Generazione::~Generazione()
     cout << "DESTRUCTOR - this: " << this << endl;
 }
 
-int Generazione::Multiplicity(bool distr, int nScelto){
+int Generazione::Multiplicity(bool distr, int nScelto) const{
     int Multi = 0;
 
     if (distr == true) {
@@ -46,11 +46,11 @@ int Generazione::Multiplicity(bool distr, int nScelto){
     return Multi;   
 }
 
-double Generazione::VertexSimXY(){
+double Generazione::VertexSimXY() const{
     return gRandom->Gaus(0., fRMSxy);
 }
 
-double Generazione::VertexSimZ(bool distr){
+double Generazione::VertexSimZ(bool distr) const{
     double z = 0;
 
     if (distr == true) {
@@ -62,11 +62,11 @@ double Generazione::VertexSimZ(bool distr){
     return z;
 }
 
-double Generazione::Phi(){
+double Generazione::Phi() const{
     return gRandom->Rndm() * 2. * M_PI;
 }
 
-double Generazione::Theta(){
+double Generazione::Theta() const{
     double eta = fEta->GetRandom();
     return 2. * TMath::ATan(TMath::Exp(-eta));
 }
