@@ -15,7 +15,7 @@ MyEs::~MyEs()
     cout<<"DESTRUCTOR - this:  "<<this<<endl;
 }
 
-double MyEs::MediaVector(const std::vector<double>& vec){
+double MyEs::MediaVector(const std::vector<double>& vec) const{
     double somma = 0;
     int count = 0;
 
@@ -31,15 +31,14 @@ double MyEs::MediaVector(const std::vector<double>& vec){
     return somma / count;
 }
 
-double MyEs::Intersezione(double r1, double z1, double r2, double z2){
+double MyEs::Intersezione(double r1, double z1, double r2, double z2) const{
 
     double m = (r2 - r1)/(z2 - z1);
     
     return z1 - r1/m;
 }
 
-double MyEs::Intersezione2(double r1, double phi1, double z1, double r2, double phi2, double z2)
-{
+double MyEs::Intersezione2(double r1, double phi1, double z1, double r2, double phi2, double z2) const{
     double x1 = r1 * TMath::Cos(phi1);
     double y1 = r1 * TMath::Sin(phi1);
     double x2 = r2 * TMath::Cos(phi2);
@@ -60,7 +59,7 @@ double MyEs::Intersezione2(double r1, double phi1, double z1, double r2, double 
     return z_proj;
 }
 
-double MyEs::RunWind(const std::vector<double>& vertice){
+double MyEs::RunWind(const std::vector<double>& vertice) const{
     vector<double> pluto;
     if (vertice.empty()) {
         return 10000;
