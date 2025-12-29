@@ -73,7 +73,7 @@ void Trasporto::EquazioneRetta(double punto[3], const double versori[3], double 
 }
 
 void Trasporto::Scattering(double versore[3], bool on){
-    if (!on) return;
+    if (!on) return;        \\ nel caso fosse false no si ha MCS, non cambia il vettore versore
 
     double T[3][3];
 
