@@ -35,7 +35,7 @@ int Generazione::Multiplicity(bool distr, int nScelto) const{
 
     if (distr == true) {
         if (nScelto == 0)
-            Multi = gRandom->Integer(53) + 3;
+            Multi = gRandom->Integer(53) + 3;        // genera uniformemente interi tra [0,52] + 3
         else
             Multi = round(fHm->GetRandom());       
     }
@@ -47,26 +47,26 @@ int Generazione::Multiplicity(bool distr, int nScelto) const{
 }
 
 double Generazione::VertexSimXY() const{
-    return gRandom->Gaus(0., fRMSxy);
+    return gRandom->Gaus(0., fRMSxy);        // gaussiana generatrice della coordinata x e y
 }
 
 double Generazione::VertexSimZ(bool distr) const{
     double z = 0;
 
     if (distr == true) {
-        z = gRandom->Gaus(0., fRMSz);
+        z = gRandom->Gaus(0., fRMSz);        // gaussiana generatrice della coordinata z
     } else {
-        z = gRandom->Uniform(-3*fRMSz, 3*fRMSz);
+        z = gRandom->Uniform(-3*fRMSz, 3*fRMSz);        // genera uniformemente tra [-3sigma, 3sigma] con sigma la RMS della coordinata z
     }
 
     return z;
 }
 
 double Generazione::Phi() const{
-    return gRandom->Rndm() * 2. * M_PI;
+    return gRandom->Rndm() * 2. * M_PI;       
 }
 
 double Generazione::Theta() const{
     double eta = fEta->GetRandom();
-    return 2. * TMath::ATan(TMath::Exp(-eta));
+    return 2. * TMath::ATan(TMath::Exp(-eta));        // formula inversa della pseudorapidità eta
 }
