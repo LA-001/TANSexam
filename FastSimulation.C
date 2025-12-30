@@ -29,7 +29,7 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     }
 
     hm->SetDirectory(0);
-    heta2->SetDirectory(0);
+    eta->SetDirectory(0);
     file->Close();
     delete file;
 
@@ -119,7 +119,7 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     fout.Close();
 
     delete hm;
-    delete heta2;
+    delete eta;
     delete ptr;
     delete ptr2;
 }
