@@ -28,6 +28,11 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
         return;
     }
 
+    hm->SetDirectory(0);
+    heta2->SetDirectory(0);
+    file->Close();
+    delete file;
+
     TFile fout("fileRoot/simulazione.root", "RECREATE");
 
     gRandom->SetSeed(seed);
@@ -113,8 +118,8 @@ void FastSim(int numero, unsigned int seed, bool distr_z, bool distr_m, int m) {
     fout.Purge();
     fout.Close();
 
-    file->Close();
-    delete file;
+    delete hm;
+    delete heta2;
     delete ptr;
     delete ptr2;
 }
